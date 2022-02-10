@@ -46,25 +46,23 @@ char readTree(treenode *head, int hex, int len) {
     char letter;
     if (len == 0)
         return head->c;
+    if (hex % 2 == 1)
 
-    for(int i = 1; i <= len; i++) {
+    {
+        if (head->right == NULL)
+            error();
+        letter = readTree(head->right, hex >> 1, len - 1);
+    }
 
-        if (hex % 2 == 1)
-        {
-            if (head->right == NULL)
-                error();
-            letter = readTree(head->right, hex>>1, len - 1);
-        }
-
-        else
-        {
-            if (head->left == NULL)
-                error();
-            letter = readTree(head->left, hex >> 1, len - 1);
-        }
+    else
+    {
+        if (head->left == NULL)
+            error();
+        letter = readTree(head->left, hex >> 1, len - 1);
     }
     return letter;
 }
+
 
 void createTree(treenode *head) {
     head->left = createNode('E');
