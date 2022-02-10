@@ -6,6 +6,7 @@
 //      Does that help memory or only speed?
 // Review Mallocs and mem
 // Dealloc At end
+// Test
 
 #include <stdio.h>
 #include <stdlib.h>
