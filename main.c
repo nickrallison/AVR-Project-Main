@@ -7,7 +7,6 @@
 // Review Mallocs and mem
 // Dealloc At end
 // Test
-// Test + 1
 
 #include <stdio.h>
 #include <stdlib.h>
