@@ -97,4 +97,5 @@ void createTree(treenode *head) {
 
 void error() {
     printf("Len Overflow\n");
+    break;
 }
