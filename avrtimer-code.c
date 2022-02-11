@@ -1,5 +1,5 @@
 /*
- * File:   timer-code.c
+ * File:   avrtimer-code.c
  * Author: Nick Allison
  *
  * Created on February 11, 2022, 12:00 PM
@@ -28,40 +28,39 @@ int main(void) {
 
     PORTA.OUT |= 0b00100000; //Off
 
-    // Set internal clock frequency to 8 MHz.
+    // Set internal clock frequency to 1 MHz.
     CCP = 0xd8;
-    CLKCTRL.OSCHFCTRLA = 0b00010100;
+    CLKCTRL.OSCHFCTRLA = 0b00000000;
     while( CLKCTRL.MCLKSTATUS & 0b00000001 ){
         ;
     }
 
-    // Configure the timer to increment every 128us.
-    // - Divide the 8MHz clock by 1024.
-    TCA0.SINGLE.CTRLA = 0b00001111; // f = 7812.5 Hz, T = 128us
+    // Configure the timer to increment every 256us.
+    // - Divide the 1MHz clock by 256.
+    TCA0.SINGLE.CTRLA = 0b00001101; // f = 3906.25 Hz, T = 256us
 
     // We will manually check the timer and reset the timer
     // so set the period to its max value to avoid an automatic
     // reset.
-    TCA0.SINGLE.PER = 0xffff; //max timer time is 8.38s
-
-    // Set the timer threshold to 1.28ms.
-    unsigned int timerThreshold = 10; //WORK HERE
-
+    TCA0.SINGLE.PER = 0xffff; //max timer time is 16.78s
 
     while (1) {
-        if(~PORTA.IN & 0b01000000)
+        count = 0;
+        TCA0.SINGLE.CNT = 0;
+        PORTA.OUT |= 0b00100000; //Off
+        if(~PORTA.IN & 0b01000000) {
             TCA0.SINGLE.CNT = 0;
-        while(1)
-            if(PORTA.IN & 0b01000000){
-                count = TCA0.SINGLE.CNT;
-                break;
-            }
+            while (1)
+                if (PORTA.IN & 0b01000000) {
+                    count = TCA0.SINGLE.CNT;
+                    break;
+                }
+        }
         if (count != 0) {
+            TCA0.SINGLE.CNT = 0;
             while (TCA0.SINGLE.CNT <= count){
                 PORTA.OUT &= 0b11011111; //On
             }
-            PORTA.OUT |= 0b00100000; //Off
-            count = 0;
         }
 
     }
