@@ -45,7 +45,7 @@ int main(void) {
     TCA0.SINGLE.PER = 0xffff; //max timer time is 16.78s
 
     while (1) {
-        count = 0;
+        count = 0; //To find total time, each count is equal to 256us, multiply by 256e-6s
         TCA0.SINGLE.CNT = 0;
         PORTA.OUT |= 0b00100000; //Off
         if(~PORTA.IN & 0b01000000) {
