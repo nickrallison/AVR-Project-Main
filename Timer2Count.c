@@ -1,11 +1,5 @@
-/*
- * File:   avrtimer-code.c
- * Author: Nick Allison
- *
- * Created on February 11, 2022, 12:00 PM
- * Test
- */
-
+// Todo
+// Turn into either main or its own func
 
 #include <avr/io.h>
 #include <stdio.h>
