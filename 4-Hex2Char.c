@@ -5,14 +5,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "Hex2Char.h"
+#include "4-Hex2Char.h"
 
-void main(void) {
-    treenode* head = createNode('\0');
-    createTree(head);
-    char letter = readTree(head, 0xc, 3);
-    printf("letter = %c\n", letter);
-}
+//
+//void main(void) {
+//    treenode* head = createNode('\0');
+//    createTree(head);
+//    char letter = readTree(head, 0xc, 3);
+//    printf("letter = %c\n", letter);
+//}
 
 treenode *createNode(char letter) {
     treenode* result = malloc(sizeof(treenode));

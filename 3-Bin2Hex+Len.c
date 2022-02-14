@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "Timer2Count.h"
-#include "Count2Binary.h"
-#include "Bin2Hex+Len.h"
+#include "1-Timer2Count.h"
+#include "2-Count2Binary.h"
+#include "3-Bin2Hex+Len.h"
 
 //Need to use pointer to hex?? / Counter??
 //Would this be any easier with C++

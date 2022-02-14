@@ -2,8 +2,8 @@
 // Created by nickr on 2022-02-14.
 //
 
-#ifndef AVR_PROJECT_MAIN_TIMER2COUNT_H
-#define AVR_PROJECT_MAIN_TIMER2COUNT_H
+#ifndef AVR_PROJECT_MAIN_1_TIMER2COUNT_H
+#define AVR_PROJECT_MAIN_1_TIMER2COUNT_H
 
 #define FUNDFREQ 1000000
 #define FREQDIV 256
@@ -17,4 +17,4 @@ int portinprev = 1;
 int count = 0;
 int swapflag = 0;
 
-#endif AVR_PROJECT_MAIN_TIMER2COUNT_H
+#endif AVR_PROJECT_MAIN_1_TIMER2COUNT_H

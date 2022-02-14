@@ -1,8 +1,3 @@
-// Review Mallocs and mem
-// Dealloc At end
-// Test
-
-
 // Todo
 // Should Button2Count call Count2Binary or vice versa
 // Top Down or Botton up?
@@ -18,17 +13,16 @@
 // Wait Mode after long pause
 // Global Vars
 // Implement Hex2Char in Main Setup
-
-//WHAT TO DO BETWEEN PRESSES
-//Sleep Command (END WORD)
+// Hex2Char Edit error func
+// Sleep function for long pause
 
 #include <avr/io.h>
 #include <stdio.h>
 #include "main.h"
-#include "Timer2Count.h"    // First Level
-#include "Count2Binary.h"   // Second Level
-#include "Bin2Hex+Len.h"    // Third Level
-#include "Hex2Char.h"       // Fourth Level
+#include "1-Timer2Count.h"    // First Level
+#include "2-Count2Binary.h"   // Second Level
+#include "3-Bin2Hex+Len.h"    // Third Level
+#include "4-Hex2Char.h"       // Fourth Level
 
 //PORTA.OUT |= 0b00100000; //Off
 //PORTA.OUT &= 0b11011111; //On
@@ -36,15 +30,19 @@
 
 int main(void) {
     initAVR();
-    while (1) {                                 //Resets Count, Clock, and PortOut Every Cycle
-        if (TCA0.SINGLE.CNT * COUNTSEC > LONGPAUSE )
-            char letter = readTree(head, hex, 3)
+    while (1) {
+        if (TCA0.SINGLE.CNT * COUNTSEC > LONGPAUSE ) {           //if a long pause occurs the word ends
+            letter = readTree(head, hex, 3);
+            hex = 0;
+            len = 0;
+            sleep();
+        }
 
-            ButtonSwap();
+        ButtonSwap();
 
         if (swapflag) {
-            if (buttonon == 0) {                             //Button off after swap (Button was just on)
-                int v = Count2Binary(count, buttonon^1);
+            if (buttonon == 0) {                             // When Button swaps and ends on off, binary an
+                int v = Count2Binary(count, 1);
                 Bin2Hex(&hex, &len, v);
             }
             swapflag = 0;
@@ -55,11 +53,16 @@ int main(void) {
 
 
 void initAVR() {
-    buttonon = 0;
-    portinprev = 1;
-    count = 0;
-    swapflag = 0;
+    buttonon = 0;               // Button State
+    portinprev = 0b01000000;    // Previous Clock cycle's port in
+    count = 0;                  // Timer Count
+    swapflag = 0;               // Set to 1 after Button swapped places
     len = 0;
+    hex = 0;
+    letter = '\0';
+
+    head = createNode('\0');
+    createTree(head);
 
     PORTA.DIRSET = 0b00100000;          // Enable PA5 as an output pin.
     PORTA.DIRCLR = 0b01000000;          // Enable PA6 as an input pin.
