@@ -1,48 +1,21 @@
 // Todo
 // Turn into either main or its own func
+//#define BUTTONDOWN ~PORTA.IN&0b01000000
+//#define BUTTONUP PORTA.IN&0b01000000
 
 #include <avr/io.h>
 #include <stdio.h>
 
+int Button2Count();
 
+count = 0;                                      //Global Var
 
-int count = 1.28; //count is in ms
 
 int main(void) {
-
-    // Enable PA5 as an output pin.
-    PORTA.DIRSET = 0b00100000;
-
-    // Enable PA6 as an input pin.
-    PORTA.DIRCLR = 0b01000000;
-
-
-    //PORTA.OUT |= 0b00100000; //Off
-    //PORTA.OUT &= 0b11011111; //On
-
-    PORTA.OUT |= 0b00100000; //Off
-
-    // Set internal clock frequency to 1 MHz.
-    CCP = 0xd8;
-    CLKCTRL.OSCHFCTRLA = 0b00000000;
-    while( CLKCTRL.MCLKSTATUS & 0b00000001 ){
-        ;
-    }
-
-    // Configure the timer to increment every 256us.
-    // - Divide the 1MHz clock by 256.
-    TCA0.SINGLE.CTRLA = 0b00001101; // f = 3906.25 Hz, T = 256us
-
-    // We will manually check the timer and reset the timer
-    // so set the period to its max value to avoid an automatic
-    // reset.
-    TCA0.SINGLE.PER = 0xffff; //max timer time is 16.78s
-
-    while (1) {
-        count = 0; //To find total time, each count is equal to 256us, multiply by 256e-6s
-        TCA0.SINGLE.CNT = 0;
-        PORTA.OUT |= 0b00100000; //Off
-        if(~PORTA.IN & 0b01000000) {
+    while (1) {                                 //Resets Count, Clock, and PortOut Every Cycle
+        TCA0.SINGLE.CNT = 0;                    //
+        PORTA.OUT |= 0b00100000;                //
+        if(~PORTA.IN & 0b01000000) {            //if Button is held down
             TCA0.SINGLE.CNT = 0;
             while (1)
                 if (PORTA.IN & 0b01000000) {
@@ -56,6 +29,22 @@ int main(void) {
                 PORTA.OUT &= 0b11011111; //On
             }
         }
+    }
+}
 
+int Button2Count() {
+    if(~PORTA.IN & 0b01000000) {            //if Button is held down
+        TCA0.SINGLE.CNT = 0;                //Sets Clock to zero
+        while (1)                           //Loops until button released
+            if (PORTA.IN & 0b01000000) {
+                count = TCA0.SINGLE.CNT;    //Sets count equal to clock
+                break;
+            }
+    }
+    if (count != 0) {                       //After Previous part executes
+        TCA0.SINGLE.CNT = 0;                //
+        while (TCA0.SINGLE.CNT <= count){
+            PORTA.OUT &= 0b11011111; //On
+        }
     }
 }
