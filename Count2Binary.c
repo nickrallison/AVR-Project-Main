@@ -3,21 +3,18 @@
 #include "Timer2Count.h"
 #include "Count2Binary.h"
 
-void main(void) {
 
+int Count2Binary(int count, int press){
+    if (press) {
+        if (count * COUNTSEC > LONGPRESS)
+            return 1;
+        else
+            return 0;
+    }
+    else {
+        if (count * COUNTSEC > LONGPAUSE)
+            return 1;
+        else
+            return 0;
+    }
 }
-
-int Press2Bin(int count){
-    if (count * COUNTSEC > LONGPRESS)
-        return 1;
-    else
-        return 0;
-}
-
-int Hold2Bin(int count){
-    if (count * COUNTSEC > LONGPAUSE)
-        return 1;
-    else
-        return 0;
-}
-

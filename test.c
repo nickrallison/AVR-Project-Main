@@ -12,9 +12,6 @@ void showbits( unsigned int x )
 }
 
 void main(void) {
-    int a = 0x00;
-    a += pow(2,4);
-    a  = a>>0;
-    showbits(a);
-    printf("a = %x", a);
+    printf("a = %x\n", ((1 & 0b00000001) ^ (1 & 0b00000001)));
+
 }

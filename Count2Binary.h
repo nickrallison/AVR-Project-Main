@@ -9,7 +9,6 @@
 #define SHORTPRESS 0.5 //Not used
 #define LONGPAUSE 3
 
-int Timer2Bin(int count);
-int Hold2Bin(int count);
+int Count2Binary(int count, int press);
 
 #endif //AVR_PROJECT_MAIN_COUNT2BINARY_H
