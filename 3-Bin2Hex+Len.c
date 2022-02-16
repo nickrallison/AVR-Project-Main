@@ -10,10 +10,8 @@
 
 
 void Bin2Hex(int *hex, int *counter, int longpress) {
-    if (longpress != 0) {
-        *counter += 1;
-        *hex += longpress * pow(2, *counter);
-    }
+    *counter += 1;
+    *hex += longpress * pow(2, *counter);
 }
 
 

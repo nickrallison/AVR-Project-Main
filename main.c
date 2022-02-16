@@ -8,9 +8,7 @@
 // #define BUTTONUP PORTA.IN&0b01000000
 // Can I use Malloc to help memory
 // Does comparing against the previous cycle slow it down too much
-// Set Count to zero at beginning
 // Make sure no bad signals sent during initialization
-// Wait Mode after long pause
 // Global Vars
 // Implement Hex2Char in Main Setup
 // Hex2Char Edit error func
@@ -18,7 +16,7 @@
 
 #include <avr/io.h>
 #include <stdio.h>
-#include "main.h"
+#include <main.h>
 #include "1-Timer2Count.h"    // First Level
 #include "2-Count2Binary.h"   // Second Level
 #include "3-Bin2Hex+Len.h"    // Third Level
@@ -32,7 +30,7 @@ int main(void) {
     initAVR();
     while (1) {
         if (TCA0.SINGLE.CNT * COUNTSEC > LONGPAUSE ) {           //if a long pause occurs the word ends
-            letter = readTree(head, hex, 3);
+            letter = readTree(head, hex, len);
             hex = 0;
             len = 0;
             sleep();
