@@ -12,9 +12,4 @@
 
 int ButtonSwap();
 
-int buttonon = 0;
-int portinprev = 1;
-int count = 0;
-int swapflag = 0;
-
 #endif AVR_PROJECT_MAIN_1_TIMER2COUNT_H

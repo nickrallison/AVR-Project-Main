@@ -5,8 +5,6 @@
 #ifndef AVR_PROJECT_MAIN_4_HEX2CHAR_H
 #define AVR_PROJECT_MAIN_4_HEX2CHAR_H
 
-char letter;
-
 typedef struct treenode {
     char c;
     struct treenode *left;
