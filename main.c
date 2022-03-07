@@ -1,6 +1,6 @@
 // Todo
 // Should Button2Count call Count2Binary or vice versa
-// Top Down or Botton up?
+// Top Down or Bottom up?
 // Should Timer2Count Return 0 when no button has been held down
 // Only use Timer2PauseCount() after a button is pressed once
 // How to incorperate Timer2PauseCount()
@@ -27,6 +27,17 @@
 
 
 int main(void) {
+    int buttonon = 0;               // Button State
+    int portinprev = 0b01000000;    // Previous Clock cycle's port in
+    int count = 0;                  // Timer Count
+    int swapflag = 0;               // Set to 1 after Button swapped places
+    int len = 0;
+    int hex = 0;
+    char letter = '\0';
+
+    treenode *head = createNode('\0');
+    createTree(head);
+
     initAVR();
     while (1) {
         if (TCA0.SINGLE.CNT * COUNTSEC > LONGPAUSE ) {           //if a long pause occurs the word ends
@@ -35,7 +46,7 @@ int main(void) {
             len = 0;
         }
 
-        ButtonSwap();
+        ButtonSwap(&buttonon, &count, &swapflag, &portinprev);
 
         if (swapflag) {
             if (buttonon == 0) {                             // When Button swaps and ends on off, binary an
@@ -50,16 +61,6 @@ int main(void) {
 
 
 void initAVR() {
-    int buttonon = 0;               // Button State
-    int portinprev = 0b01000000;    // Previous Clock cycle's port in
-    int count = 0;                  // Timer Count
-    int swapflag = 0;               // Set to 1 after Button swapped places
-    int len = 0;
-    int hex = 0;
-    char letter = '\0';
-
-    head = createNode('\0');
-    createTree(head);
 
     PORTA.DIRSET = 0b00100000;          // Enable PA5 as an output pin.
     PORTA.DIRCLR = 0b01000000;          // Enable PA6 as an input pin.

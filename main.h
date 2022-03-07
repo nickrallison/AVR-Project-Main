@@ -5,9 +5,8 @@
 #ifndef AVR_PROJECT_MAIN_MAIN_H
 #define AVR_PROJECT_MAIN_MAIN_H
 
-void initAVR();
 
-//Globals//
+void initAVR();
 
 
 #endif //AVR_PROJECT_MAIN_MAIN_H

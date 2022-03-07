@@ -11,8 +11,6 @@ typedef struct treenode {
     struct treenode *right;
 } treenode;
 
-treenode *head;
-
 treenode *createNode(char letter);
 
 char readTree(treenode *head, int hex, int len);

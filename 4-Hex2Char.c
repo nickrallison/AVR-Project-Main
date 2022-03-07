@@ -25,25 +25,25 @@ treenode *createNode(char letter) {
     return result;
 }
 
-char readTree(treenode *head, int hex, int len) {
-    char letter;
-    if (len == 0)
+char readTree(treenode *head, int hexi, int leni) {
+    char letteri = '\0';
+    if (leni == 0)
         return head->c;
-    if (hex % 2 == 1)
+    if (hexi % 2 == 1)
 
     {
         if (head->right == NULL)
             //error();
-            letter = readTree(head->right, hex >> 1, len - 1);
+            letteri = readTree(head->right, hexi >> 1, leni - 1);
     }
 
     else
     {
         if (head->left == NULL)
             //error();
-            letter = readTree(head->left, hex >> 1, len - 1);
+            letteri = readTree(head->left, hexi >> 1, leni - 1);
     }
-    return letter;
+    return letteri;
 }
 
 
