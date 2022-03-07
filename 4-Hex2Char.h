@@ -21,6 +21,6 @@ void createTree(treenode *head);
 
 void error();
 
-#endif AVR_PROJECT_MAIN_4_HEX2CHAR_H
+#endif //AVR_PROJECT_MAIN_4_HEX2CHAR_H
 
 

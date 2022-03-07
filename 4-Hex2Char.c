@@ -33,15 +33,15 @@ char readTree(treenode *head, int hex, int len) {
 
     {
         if (head->right == NULL)
-            error();
-        letter = readTree(head->right, hex >> 1, len - 1);
+            //error();
+            letter = readTree(head->right, hex >> 1, len - 1);
     }
 
     else
     {
         if (head->left == NULL)
-            error();
-        letter = readTree(head->left, hex >> 1, len - 1);
+            //error();
+            letter = readTree(head->left, hex >> 1, len - 1);
     }
     return letter;
 }

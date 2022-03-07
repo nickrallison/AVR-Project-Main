@@ -16,7 +16,7 @@
 
 #include <avr/io.h>
 #include <stdio.h>
-#include <main.h>
+#include "main.h"
 #include "1-Timer2Count.h"    // First Level
 #include "2-Count2Binary.h"   // Second Level
 #include "3-Bin2Hex+Len.h"    // Third Level
@@ -33,7 +33,6 @@ int main(void) {
             letter = readTree(head, hex, len);
             hex = 0;
             len = 0;
-            sleep();
         }
 
         ButtonSwap();
@@ -51,13 +50,13 @@ int main(void) {
 
 
 void initAVR() {
-    buttonon = 0;               // Button State
-    portinprev = 0b01000000;    // Previous Clock cycle's port in
-    count = 0;                  // Timer Count
-    swapflag = 0;               // Set to 1 after Button swapped places
-    len = 0;
-    hex = 0;
-    letter = '\0';
+    int buttonon = 0;               // Button State
+    int portinprev = 0b01000000;    // Previous Clock cycle's port in
+    int count = 0;                  // Timer Count
+    int swapflag = 0;               // Set to 1 after Button swapped places
+    int len = 0;
+    int hex = 0;
+    char letter = '\0';
 
     head = createNode('\0');
     createTree(head);

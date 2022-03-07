@@ -7,4 +7,4 @@
 
 void Bin2Hex(int *hex, int *counter, int longpress);
 
-#endif AVR_PROJECT_MAIN_3_BIN2HEX_LEN_H
+#endif //AVR_PROJECT_MAIN_3_BIN2HEX_LEN_H
