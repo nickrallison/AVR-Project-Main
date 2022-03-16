@@ -27,7 +27,7 @@
 
 int main(void) {
     unsigned int freq = 7813;
-    unsigned int freqDesired = 131;
+    unsigned int freqDesired = 256;
     unsigned int timerThreshold = detTimerThreshold(freq, freqDesired);
     unsigned int onFlag = 0;
     int buttonOn = 0;               // Button State
@@ -58,15 +58,14 @@ int main(void) {
                 PORTA.OUT &= 0b11101111;
                 clock = TCA0.SINGLE.CNT;
                 while( TCA0.SINGLE.CNT - clock <= timerThreshold) ;
-                TCA0.SINGLE.CNT = 0;
+
 
                 PORTA.OUT |= 0b00010000;
                 clock = TCA0.SINGLE.CNT;
                 while( TCA0.SINGLE.CNT - clock <= timerThreshold) ;
-                TCA0.SINGLE.CNT = 0;
+
             }
         }
-    }
         if (TCA0.SINGLE.CNT * COUNTSEC > LONGPAUSE ) {           //if a long pause occurs the word ends
             letter = readTree(head, hex, len);
             hex = 0;

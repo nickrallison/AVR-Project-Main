@@ -10,7 +10,7 @@ int Count2Binary(int count, int press);
 #endif //AVR_PROJECT_MAIN_2_COUNT2BINARY_H
 
 #ifndef LONGPRESS
-#define LONGPRESS 1
+#define LONGPRESS 0.5
 
 #endif
 
