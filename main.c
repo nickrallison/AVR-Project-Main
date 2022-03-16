@@ -27,6 +27,8 @@
 
 
 int main(void) {
+    unsigned int timerThreshold = 250;
+    unsigned int onFlag = 0;
     int buttonon = 0;               // Button State
     int portinprev = 0b01000000;    // Previous Clock cycle's port in
     int count = 0;                  // Timer Count
@@ -40,6 +42,15 @@ int main(void) {
 
     initAVR();
     while (1) {
+        TCA0.SINGLE.CNT = 0;
+        PORTA.OUT |= 0b00010000;
+        if (letter > 96) {
+            TCA0.SINGLE.CNT = 0;
+            PORTA.OUT &= 0b11101111;
+            while( TCA0.SINGLE.CNT <= 4*timerThreshold) ;
+            letter = 0;
+        }
+    }
         if (TCA0.SINGLE.CNT * COUNTSEC > LONGPAUSE ) {           //if a long pause occurs the word ends
             letter = readTree(head, hex, len);
             hex = 0;
@@ -62,22 +73,32 @@ int main(void) {
 
 void initAVR() {
 
-    PORTA.DIRSET = 0b00100000;          // Enable PA5 as an output pin.
-    PORTA.DIRCLR = 0b01000000;          // Enable PA6 as an input pin.
-    PORTA.OUT |= 0b00100000;            //Off
 
+    // Set internal clock frequency to 1 MHz.
     CCP = 0xd8;
     CLKCTRL.OSCHFCTRLA = 0b00000000;
     while( CLKCTRL.MCLKSTATUS & 0b00000001 ){
-        ;                               // Set internal clock frequency to 1 MHz.
+        ;
     }
+    // Configure the timer to increment every 2us.
+    // - Divide the 1MHz clock by 1024.
+    // Freq now set to 976.6Hz
+    TCA0.SINGLE.CTRLA = 0b00001111;
 
-    TCA0.SINGLE.CTRLA = 0b00001101; // Configure the timer to increment every 256us.
-    // - Divide the 1MHz clock by 256.
-    // f = 3906.25 Hz, T = 256us
+    // We will manually check the timer and reset the timer
+    // so set the period to its max value to avoid an automatic
+    // reset.
+    TCA0.SINGLE.PER = 0xffff;
 
-    TCA0.SINGLE.PER = 0xffff;       //Max timer due to 2 byte counter
     //Max timer time is 16.78s
     TCA0.SINGLE.CNT = 0;
+
+    // Configure PA4 as our output pin.
+    PORTA.DIRSET = 0b00010000;
+
+    // Enable PA6 as an input pin.
+    PORTA.DIRCLR = 0b01000000;
+
+
     PORTA.OUT |= 0b00100000;
 }

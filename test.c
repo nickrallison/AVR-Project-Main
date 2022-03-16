@@ -16,9 +16,6 @@ int main(void) {
     while( CLKCTRL.MCLKSTATUS & 0b00000001 ){
         ;
     }
-
-
-
     // Configure the timer to increment every 2us.
     // - Divide the 1MHz clock by 1024.
     // Freq now set to 976.6Hz
