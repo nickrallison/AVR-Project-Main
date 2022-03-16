@@ -14,6 +14,8 @@
 // Hex2Char Edit error func
 // Sleep function for long pause
 
+// Fix 1 - Only finds presses and not releases
+
 #include <avr/io.h>
 #include <stdio.h>
 #include "main.h"
@@ -31,26 +33,30 @@ int main(void) {
     unsigned int timerThreshold = detTimerThreshold(freq, freqDesired);
     unsigned int onFlag = 0;
     int buttonOn = 0;               // Button State
-    int portInPrev = 0b01000000;    // Previous Clock cycle's port in
     int count = 0;                  // Timer Count
     int swapFlag = 0;               // Set to 1 after Button swapped places
     int len = 0;
     int hex = 0;
-    char letter = '\0';
+    char letter = 0;
     unsigned int clock;
+    int portInPrev = 0b01000000;
 
     treenode *head = createNode('\0');
     createTree(head);
 
     initAVR();
+    TCA0.SINGLE.CNT = 0;
     while (1) {
-        PORTA.OUT |= 0b00010000;
+        PORTA.OUT &= 0b11101111;
         letter = 0;
 
-        if (TCA0.SINGLE.CNT >= 32768) {
-            TCA0.SINGLE.CNT = 0;
+        if (TCA0.SINGLE.CNT * COUNTSEC > LONGPAUSE ) {           //if a long pause occurs the word ends
+            
+            letter = readTree(head, hex, len);
+            hex = 0;
+            len = 0;
         }
-
+        
         if (letter > 96) {
             TCA0.SINGLE.CNT = 0;
 
@@ -66,20 +72,16 @@ int main(void) {
 
             }
         }
-        if (TCA0.SINGLE.CNT * COUNTSEC > LONGPAUSE ) {           //if a long pause occurs the word ends
-            letter = readTree(head, hex, len);
-            hex = 0;
-            len = 0;
-        }
+       
 
-        ButtonSwap(&buttonon, &count, &swapflag, &portinprev);
+        ButtonSwap(&buttonOn, &count, &swapFlag, &portInPrev);
 
-        if (swapflag) {
-            if (buttonon == 0) {                             // When Button swaps and ends on off, binary an
-                int v = Count2Binary(count, 1);
-                Bin2Hex(&hex, &len, v);
-            }
-            swapflag = 0;
+        if (swapFlag) { 
+            //swapFlag = 0;
+                                      // When Button swaps and ends on off, binary an
+            //int v = Count2Binary(count, 1);
+            //Bin2Hex(&hex, &len, v);
+            
         }
     }
 }
@@ -108,14 +110,15 @@ void initAVR() {
     //Max timer time is 8.38s
     TCA0.SINGLE.CNT = 0;
 
-    // Configure PA4 as our output pin.
-    PORTA.DIRSET = 0b00010000;
+    // Configure PA4 and PA5 as our output pin.
+    PORTA.DIRSET = 0b00110000;
 
     // Enable PA6 as an input pin.
     PORTA.DIRCLR = 0b01000000;
 
 
     PORTA.OUT |= 0b00100000;
+    PORTA.OUT &= 0b11101111;
 }
 
 

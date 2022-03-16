@@ -4,12 +4,23 @@
 #include "2-Count2Binary.h"
 #include "main.h"
 
-void ButtonSwap(int *buttonon, int *count, int *swapflag, int *portinprev) {
-    if((PORTA.IN & 0b01000000) ^ (*portinprev & 0b01000000)) {   //if port in doesnt match previous value
+void ButtonSwap(int *buttonon, int *count, int *swapflag, int *portInPrev) {
+    
+    unsigned int clock;
+    
+    if((PORTA.IN & 0b01000000)^(*portInPrev & 0b01000000)) {   //if port in doesnt match previous value
+        *portInPrev = (PORTA.IN & 0b01000000);
         *buttonon ^= 1;                                          //Might need to use pointers
         *count = TCA0.SINGLE.CNT;
-        TCA0.SINGLE.CNT = 0;
         *swapflag = 1;
-        *portinprev = PORTA.IN;
     }
+    PORTA.OUT &= 0b11011111;
+    clock = TCA0.SINGLE.CNT;
+    while( TCA0.SINGLE.CNT - clock <= 7812) ;
+
+
+    PORTA.OUT |= 0b00100000;
+    clock = TCA0.SINGLE.CNT;
+    while( TCA0.SINGLE.CNT - clock <= 7812) ;
+    
 }
