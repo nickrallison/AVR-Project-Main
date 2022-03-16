@@ -15,6 +15,6 @@ int Count2Binary(int count, int press);
 #endif
 
 #ifndef LONGPAUSE
-#define LONGPAUSE 1
+#define LONGPAUSE 2
 
 #endif

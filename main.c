@@ -26,7 +26,7 @@
 //PORTA.OUT &= 0b11011111; //On
 
 int main(void) {
-    unsigned int freq = 23437;
+    unsigned int freq = 7813;
     unsigned int freqDesired = 131;
     unsigned int timerThreshold = detTimerThreshold(freq, freqDesired);
     unsigned int onFlag = 0;
@@ -37,21 +37,34 @@ int main(void) {
     int len = 0;
     int hex = 0;
     char letter = '\0';
+    unsigned int clock;
 
     treenode *head = createNode('\0');
     createTree(head);
 
     initAVR();
     while (1) {
-        TCA0.SINGLE.CNT = 0;
         PORTA.OUT |= 0b00010000;
+        letter = 0;
+
+        if (TCA0.SINGLE.CNT >= 32768) {
+            TCA0.SINGLE.CNT = 0;
+        }
+
         if (letter > 96) {
             TCA0.SINGLE.CNT = 0;
-            PORTA.OUT &= 0b11101111;
-            while( TCA0.SINGLE.CNT <= 4*timerThreshold) {
 
+            while( TCA0.SINGLE.CNT <= freq) {
+                PORTA.OUT &= 0b11101111;
+                clock = TCA0.SINGLE.CNT;
+                while( TCA0.SINGLE.CNT - clock <= timerThreshold) ;
+                TCA0.SINGLE.CNT = 0;
+
+                PORTA.OUT |= 0b00010000;
+                clock = TCA0.SINGLE.CNT;
+                while( TCA0.SINGLE.CNT - clock <= timerThreshold) ;
+                TCA0.SINGLE.CNT = 0;
             }
-            letter = 0;
         }
     }
         if (TCA0.SINGLE.CNT * COUNTSEC > LONGPAUSE ) {           //if a long pause occurs the word ends
@@ -77,15 +90,15 @@ int main(void) {
 void initAVR() {
 
 
-    // Set internal clock frequency to 24 MHz.
+    // Set internal clock frequency to 8 MHz.
     CCP = 0xd8;
-    CLKCTRL.OSCHFCTRLA = 0b00111100;
+    CLKCTRL.OSCHFCTRLA = 0b00010100;
     while( CLKCTRL.MCLKSTATUS & 0b00000001 ){
         ;
     }
     // Configure the timer to increment every 2us.
-    // - Divide the 24MHz clock by 1024.
-    // Freq now set to 23.44kHz
+    // - Divide the 8MHz clock by 1024.
+    // Freq now set to 7813Hz
     TCA0.SINGLE.CTRLA = 0b00001111;
 
     // We will manually check the timer and reset the timer
@@ -93,7 +106,7 @@ void initAVR() {
     // reset.
     TCA0.SINGLE.PER = 0xffff;
 
-    //Max timer time is 16.78s
+    //Max timer time is 8.38s
     TCA0.SINGLE.CNT = 0;
 
     // Configure PA4 as our output pin.
