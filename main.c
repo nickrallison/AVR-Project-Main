@@ -25,14 +25,15 @@
 //PORTA.OUT |= 0b00100000; //Off
 //PORTA.OUT &= 0b11011111; //On
 
-
 int main(void) {
-    unsigned int timerThreshold = 250;
+    unsigned int freq = 23437;
+    unsigned int freqDesired = 131;
+    unsigned int timerThreshold = detTimerThreshold(freq, freqDesired);
     unsigned int onFlag = 0;
-    int buttonon = 0;               // Button State
-    int portinprev = 0b01000000;    // Previous Clock cycle's port in
+    int buttonOn = 0;               // Button State
+    int portInPrev = 0b01000000;    // Previous Clock cycle's port in
     int count = 0;                  // Timer Count
-    int swapflag = 0;               // Set to 1 after Button swapped places
+    int swapFlag = 0;               // Set to 1 after Button swapped places
     int len = 0;
     int hex = 0;
     char letter = '\0';
@@ -47,7 +48,9 @@ int main(void) {
         if (letter > 96) {
             TCA0.SINGLE.CNT = 0;
             PORTA.OUT &= 0b11101111;
-            while( TCA0.SINGLE.CNT <= 4*timerThreshold) ;
+            while( TCA0.SINGLE.CNT <= 4*timerThreshold) {
+
+            }
             letter = 0;
         }
     }
@@ -74,15 +77,15 @@ int main(void) {
 void initAVR() {
 
 
-    // Set internal clock frequency to 1 MHz.
+    // Set internal clock frequency to 24 MHz.
     CCP = 0xd8;
-    CLKCTRL.OSCHFCTRLA = 0b00000000;
+    CLKCTRL.OSCHFCTRLA = 0b00111100;
     while( CLKCTRL.MCLKSTATUS & 0b00000001 ){
         ;
     }
     // Configure the timer to increment every 2us.
-    // - Divide the 1MHz clock by 1024.
-    // Freq now set to 976.6Hz
+    // - Divide the 24MHz clock by 1024.
+    // Freq now set to 23.44kHz
     TCA0.SINGLE.CTRLA = 0b00001111;
 
     // We will manually check the timer and reset the timer
@@ -101,4 +104,9 @@ void initAVR() {
 
 
     PORTA.OUT |= 0b00100000;
+}
+
+
+unsigned int detTimerThreshold(unsigned int freq, unsigned int desiredFreq) {
+    return freq/(2*desiredFreq);
 }

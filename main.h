@@ -8,6 +8,7 @@
 
 void initAVR();
 
+unsigned int detTimerThreshold(unsigned int freq, unsigned int desiredFreq);
 
 #endif //AVR_PROJECT_MAIN_MAIN_H
 
