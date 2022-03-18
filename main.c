@@ -20,10 +20,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include "main.h"
-#include "1-Timer2Count.h"    // First Level
-#include "2-Count2Binary.h"   // Second Level
-#include "3-Bin2Hex+Len.h"    // Third Level
-#include "4-Hex2Char.h"       // Fourth Level
 
 //PORTA.OUT |= 0b00100000; //Off
 //PORTA.OUT &= 0b11011111; //On
