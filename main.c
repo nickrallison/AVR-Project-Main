@@ -38,13 +38,14 @@ int main(void) {
     int hex = 0;
     char letter = 0;
     unsigned int clock = 0;
+    unsigned int mem1;
 
     treenode *head = createNode('\0');
     createTree(head);
 
     initAVR();
     TCA0.SINGLE.CNT = 0;
-    while (1) { /*
+    while (1) { 
         PORTA.OUT &= 0b11101111;
         letter = 0;
 
@@ -53,6 +54,7 @@ int main(void) {
             letter = readTree(head, hex, len);
             hex = 0;
             len = 0;
+            TCA0.SINGLE.CNT = 0;
         }
 
         if (letter > 96) {
@@ -70,36 +72,26 @@ int main(void) {
 
             }
         }
-        if (TCA0.SINGLE.CNT * COUNTSEC > LONGPAUSE ) {           //if a long pause occurs the word ends
-            letter = readTree(head, hex, len);
-            hex = 0;
-            len = 0;
-        }
 
 
         ButtonSwap(&buttonOn, &count, &swapFlag, &portInPrev);
 
         if (swapFlag) {
-            if (buttonOn == 0) {                             // When Button swaps and ends on off, binary an
-                int v = Count2Binary(count, 1);
-                Bin2Hex(&hex, &len, v);
+            if (buttonOn == 1) {
+                mem1 = count;
+            }
+            if (buttonOn == 0) {      
+
+                int v = Count2Binary(count - mem1, 1);
+                //Bin2Hex(&hex, &len, v);
             }
             swapFlag = 0;
-                 }*/
-        TCA0.SINGLE.CNT = 0;
-        //clock = TCA0.SINGLE.CNT;
-        while (TCA0.SINGLE.CNT < 7000);
-        PORTA.OUT |= 0b11111111; 
+           
+        }
         
-        TCA0.SINGLE.CNT = 0;
-        //clock = TCA0.SINGLE.CNT;
-        while (TCA0.SINGLE.CNT < 7000);
-        PORTA.OUT &= 0b00000000;
         
     }
 }
-
-
 
 void initAVR() {
 
@@ -142,18 +134,40 @@ void ButtonSwap(int *buttonon, int *count, int *swapflag, int *portInPrev) {
 
     if((PORTA.IN & 0b01000000)^(*portInPrev & 0b01000000)) {   //if port in doesnt match previous value
         *portInPrev = (PORTA.IN & 0b01000000);
-        *buttonon ^= 1;                                          //Might need to use pointers
+        *buttonon ^= 0b00000001;                                          //Might need to use pointers
         *count = TCA0.SINGLE.CNT;
         *swapflag = 1;
+        TCA0.SINGLE.CNT = 0;
     }
 }
 
 int Count2Binary(int count, int press){
+    unsigned int clock = 0;
+    
     if (press) {
-        if (count * COUNTSEC > LONGPRESS)
+        if (count * COUNTSEC > LONGPRESS) {
+            
+                clock = TCA0.SINGLE.CNT;
+                while (TCA0.SINGLE.CNT - clock < 9000);
+                PORTA.OUT &= 0b11011111;
+            
+                clock = TCA0.SINGLE.CNT;
+                while (TCA0.SINGLE.CNT - clock < 9000);
+                PORTA.OUT |= 0b00100000; 
+                
             return 1;
-        else
+        }
+        else {
+                clock = TCA0.SINGLE.CNT;
+                while (TCA0.SINGLE.CNT - clock < 1500);
+                PORTA.OUT &= 0b11011111;
+            
+                clock = TCA0.SINGLE.CNT;
+                while (TCA0.SINGLE.CNT - clock < 1500);
+                PORTA.OUT |= 0b00100000; 
+                
             return 0;
+        }
     }
     else {
         if (count * COUNTSEC > LONGPAUSE)

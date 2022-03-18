@@ -13,7 +13,7 @@ unsigned int detTimerThreshold(unsigned int freq, unsigned int desiredFreq);
 #define FUNDFREQ 8000000
 #define FREQDIV 1024
 #define COUNTSEC FREQDIV/FUNDFREQ
-#define LONGESTTIME COUNTSEC*65536
+#define LONGESTTIME COUNTSEC*65535
 
 void ButtonSwap();
 
@@ -37,7 +37,7 @@ int Count2Binary(int count, int press);
 #endif
 
 #ifndef LONGPAUSE
-#define LONGPAUSE 2
+#define LONGPAUSE 5
 
 #endif
 
