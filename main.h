@@ -12,6 +12,7 @@ unsigned int detTimerThreshold(unsigned int freq, unsigned int desiredFreq);
 
 #define FUNDFREQ 8000000.0
 #define FREQDIV 1024.0
+#define FREQ 7813
 #define COUNTSEC FREQDIV/FUNDFREQ
 #define LONGESTTIME COUNTSEC*65535
 
@@ -20,7 +21,7 @@ void ButtonSwap();
 #endif //AVR_PROJECT_MAIN_MAIN_H
 
 #ifndef LONGPRESS
-#define LONGPRESS 1
+#define LONGPRESS 0.005
 
 #endif
 
@@ -31,13 +32,8 @@ int Count2Binary(int count, int press);
 
 #endif //AVR_PROJECT_MAIN_2_COUNT2BINARY_H
 
-#ifndef LONGPRESS
-#define LONGPRESS 0.5
-
-#endif
-
 #ifndef LONGPAUSE
-#define LONGPAUSE 5
+#define LONGPAUSE 3.0
 
 #endif
 

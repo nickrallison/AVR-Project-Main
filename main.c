@@ -21,14 +21,16 @@
 #include <math.h>
 #include "main.h"
 
+
 //PORTA.OUT |= 0b00100000; //Off
 //PORTA.OUT &= 0b11011111; //On
 
 
 int main(void) {
+    
     unsigned int freq = 7813;
-    unsigned int freqDesired = 256;
-    unsigned int timerThreshold = detTimerThreshold(freq, freqDesired);
+    unsigned int freqDesiredBase = 65;
+    unsigned int timerThreshold[26];
     unsigned int onFlag = 0;
     int buttonOn = 0;               // Button State
     int portInPrev = 0b01000000;    // Previous Clock cycle's port in
@@ -38,7 +40,10 @@ int main(void) {
     int hex = 0;
     char letter = 0;
     unsigned int clock = 0;
-    unsigned int mem1;
+    unsigned int mem1 = 0;
+    for (int i = 0; i < 26; i++) {
+        timerThreshold[i] = detTimerThreshold(freq, freqDesiredBase * pow(2, i / 12.0));
+    }
 
     treenode *head = createNode('\0');
     createTree(head);
@@ -49,26 +54,37 @@ int main(void) {
         PORTA.OUT &= 0b11101111;
         letter = 0;
 
-        if (TCA0.SINGLE.CNT * COUNTSEC > LONGPAUSE ) {           //if a long pause occurs the word ends
-            
+        if (TCA0.SINGLE.CNT > LONGPAUSE * FREQ ) {           //if a long pause occurs the word ends
+
             letter = readTree(head, hex, len);
+            
+            PORTA.OUT &= 0b11110111;                    //
+            clock = TCA0.SINGLE.CNT;                    //
+            while( TCA0.SINGLE.CNT - clock <= 1000) ;   //GREEN
+                                                        //
+                                                        //
+            PORTA.OUT |= 0b00001000;                    //
+            clock = TCA0.SINGLE.CNT;                    //
+            while( TCA0.SINGLE.CNT - clock <= 1000) ;   //
+           
+            
             hex = 0;
             len = 0;
             TCA0.SINGLE.CNT = 0;
         }
 
-        if (letter > 96) {
+        if (letter != 0) {
             TCA0.SINGLE.CNT = 0;
 
-            while( TCA0.SINGLE.CNT <= freq) {
-                PORTA.OUT &= 0b11101111;
+            while( TCA0.SINGLE.CNT <= FREQ) {
+                PORTA.OUT &= 0b11001111;
                 clock = TCA0.SINGLE.CNT;
-                while( TCA0.SINGLE.CNT - clock <= timerThreshold) ;
+                while( TCA0.SINGLE.CNT - clock <= timerThreshold[letter - 65]) ;
 
 
-                PORTA.OUT |= 0b00010000;
+                PORTA.OUT |= 0b00110000;
                 clock = TCA0.SINGLE.CNT;
-                while( TCA0.SINGLE.CNT - clock <= timerThreshold) ;
+                while( TCA0.SINGLE.CNT - clock <= timerThreshold[letter - 65]) ;
 
             }
         }
@@ -83,7 +99,7 @@ int main(void) {
             if (buttonOn == 0) {      
 
                 int v = Count2Binary(count - mem1, 1);
-                //Bin2Hex(&hex, &len, v);
+                Bin2Hex(&hex, &len, v);
             }
             swapFlag = 0;
            
@@ -115,14 +131,14 @@ void initAVR() {
     //Max timer time is 8.38s
     TCA0.SINGLE.CNT = 0;
 
-    // Configure PA4 and PA5 as our output pins.
-    PORTA.DIRSET = 0b00110000;
+    // Configure PA3, PA4 and PA5 as our output pins.
+    PORTA.DIRSET = 0b00111000;
 
     // Enable PA6 as an input pin.
     PORTA.DIRCLR = 0b01000000;
 
 
-    PORTA.OUT |= 0b00100000;
+    PORTA.OUT |= 0b00101000;
 }
 
 
@@ -145,12 +161,9 @@ int Count2Binary(int count, int press){
     unsigned int clock = 0;
     
     if (press) {
-        if (count * COUNTSEC > LONGPRESS) {
-            
-                clock = TCA0.SINGLE.CNT;
-                while (TCA0.SINGLE.CNT - clock < 9000);
+        if (count > LONGPRESS * FREQ) {
+
                 PORTA.OUT &= 0b11011111;
-            
                 clock = TCA0.SINGLE.CNT;
                 while (TCA0.SINGLE.CNT - clock < 9000);
                 PORTA.OUT |= 0b00100000; 
@@ -158,10 +171,8 @@ int Count2Binary(int count, int press){
             return 1;
         }
         else {
-                clock = TCA0.SINGLE.CNT;
-                while (TCA0.SINGLE.CNT - clock < 1500);
-                PORTA.OUT &= 0b11011111;
             
+                PORTA.OUT &= 0b11011111;
                 clock = TCA0.SINGLE.CNT;
                 while (TCA0.SINGLE.CNT - clock < 1500);
                 PORTA.OUT |= 0b00100000; 
@@ -170,21 +181,23 @@ int Count2Binary(int count, int press){
         }
     }
     else {
-        if (count * COUNTSEC > LONGPAUSE)
+        if (count > LONGPAUSE * FREQ) 
             return 1;
         else
             return 0;
     }
 }
 
-void Bin2Hex(int *hex, int *counter, int longpress) {
-    *counter += 1;
-    *hex += longpress * pow(2, *counter);
+void Bin2Hex(int *hex, int *len, int longpress) {
+    
+    *hex += longpress * pow(2, *len);
+    *len += 1;
+   
 }
 
 
 treenode *createNode(char letter) {
-    treenode* result = malloc(sizeof(treenode));
+    treenode* result = (treenode*) malloc(sizeof(treenode));
     if (result != NULL) {
         result->left = NULL;
         result->right = NULL;
@@ -194,24 +207,19 @@ treenode *createNode(char letter) {
 }
 
 char readTree(treenode *head, int hexi, int leni) {
+
     char letteri = '\0';
-    if (leni == 0)
+    if (leni == 0) {
         return head->c;
+    }
     if (hexi % 2 == 1)
-
     {
-        if (head->right == NULL)
-            //error();
-            letteri = readTree(head->right, hexi >> 1, leni - 1);
+        return readTree(head->right, hexi >> 1, leni - 1);
     }
 
-    else
-    {
-        if (head->left == NULL)
-            //error();
-            letteri = readTree(head->left, hexi >> 1, leni - 1);
+    else {
+        return readTree(head->left, hexi >> 1, leni - 1);        
     }
-    return letteri;
 }
 
 
