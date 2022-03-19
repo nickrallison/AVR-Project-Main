@@ -10,9 +10,9 @@ void initAVR();
 
 unsigned int detTimerThreshold(unsigned int freq, unsigned int desiredFreq);
 
-#define FUNDFREQ 8000000.0
+#define FUNDFREQ 4000000.0
 #define FREQDIV 1024.0
-#define FREQ 7813
+#define FREQ 3906.3
 #define COUNTSEC FREQDIV/FUNDFREQ
 #define LONGESTTIME COUNTSEC*65535
 
@@ -21,7 +21,7 @@ void ButtonSwap();
 #endif //AVR_PROJECT_MAIN_MAIN_H
 
 #ifndef LONGPRESS
-#define LONGPRESS 0.005
+#define LONGPRESS 1
 
 #endif
 

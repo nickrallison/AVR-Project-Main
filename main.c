@@ -1,19 +1,7 @@
 
 // Todo
-// Should Button2Count call Count2Binary or vice versa
-// Top Down or Bottom up?
-// Should Timer2Count Return 0 when no button has been held down
-// Only use Timer2PauseCount() after a button is pressed once
-// How to incorperate Timer2PauseCount()
-// #define BUTTONDOWN ~PORTA.IN&0b01000000
-// #define BUTTONUP PORTA.IN&0b01000000
-// Can I use Malloc to help memory
-// Does comparing against the previous cycle slow it down too much
-// Make sure no bad signals sent during initialization
-// Global Vars
-// Implement Hex2Char in Main Setup
-// Hex2Char Edit error func
-// Sleep function for long pause
+// FIX TREE TO ERROR OUT WITH BAD INPUT
+// FIX TIMER SETTINGS
 
 #include <avr/io.h>
 #include <stdio.h>
@@ -28,7 +16,7 @@
 
 int main(void) {
     
-    unsigned int freq = 7813;
+    unsigned int freq = 3906;
     unsigned int freqDesiredBase = 65;
     unsigned int timerThreshold[26];
     unsigned int onFlag = 0;
@@ -42,7 +30,7 @@ int main(void) {
     unsigned int clock = 0;
     unsigned int mem1 = 0;
     for (int i = 0; i < 26; i++) {
-        timerThreshold[i] = detTimerThreshold(freq, freqDesiredBase * pow(2, i / 12.0));
+        timerThreshold[i] = detTimerThreshold(freq, freqDesiredBase * pow(2, i / 6.0));
     }
 
     treenode *head = createNode('\0');
@@ -60,12 +48,12 @@ int main(void) {
             
             PORTA.OUT &= 0b11110111;                    //
             clock = TCA0.SINGLE.CNT;                    //
-            while( TCA0.SINGLE.CNT - clock <= 1000) ;   //GREEN
+            while( TCA0.SINGLE.CNT - clock <= 100) ;   //GREEN
                                                         //
                                                         //
             PORTA.OUT |= 0b00001000;                    //
             clock = TCA0.SINGLE.CNT;                    //
-            while( TCA0.SINGLE.CNT - clock <= 1000) ;   //
+            while( TCA0.SINGLE.CNT - clock <= 100) ;   //
            
             
             hex = 0;
@@ -112,15 +100,15 @@ int main(void) {
 void initAVR() {
 
 
-    // Set internal clock frequency to 8 MHz.
+    // Set internal clock frequency to 4 MHz.
     CCP = 0xd8;
-    CLKCTRL.OSCHFCTRLA = 0b00010100;
+    CLKCTRL.OSCHFCTRLA = 0b00001100;
     while( CLKCTRL.MCLKSTATUS & 0b00000001 ){
         ;
     }
     // Configure the timer to increment every 2us.
-    // - Divide the 8MHz clock by 1024.
-    // Freq now set to 7813Hz
+    // - Divide the 4MHz clock by 1024.
+    // Freq now set to 3906Hz
     TCA0.SINGLE.CTRLA = 0b00001111;
 
     // We will manually check the timer and reset the timer
@@ -128,7 +116,7 @@ void initAVR() {
     // reset.
     TCA0.SINGLE.PER = 0xffff;
 
-    //Max timer time is 8.38s
+    //Max timer time is 16.77s
     TCA0.SINGLE.CNT = 0;
 
     // Configure PA3, PA4 and PA5 as our output pins.
@@ -161,11 +149,11 @@ int Count2Binary(int count, int press){
     unsigned int clock = 0;
     
     if (press) {
-        if (count > LONGPRESS * FREQ) {
+        if (count > (FREQ / 100.0)) {
 
                 PORTA.OUT &= 0b11011111;
                 clock = TCA0.SINGLE.CNT;
-                while (TCA0.SINGLE.CNT - clock < 9000);
+                while (TCA0.SINGLE.CNT - clock < 1500);
                 PORTA.OUT |= 0b00100000; 
                 
             return 1;
@@ -174,7 +162,7 @@ int Count2Binary(int count, int press){
             
                 PORTA.OUT &= 0b11011111;
                 clock = TCA0.SINGLE.CNT;
-                while (TCA0.SINGLE.CNT - clock < 1500);
+                while (TCA0.SINGLE.CNT - clock < 400);
                 PORTA.OUT |= 0b00100000; 
                 
             return 0;
