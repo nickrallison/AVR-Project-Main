@@ -10,8 +10,8 @@ void initAVR();
 
 unsigned int detTimerThreshold(unsigned int freq, unsigned int desiredFreq);
 
-#define FUNDFREQ 8000000
-#define FREQDIV 1024
+#define FUNDFREQ 8000000.0
+#define FREQDIV 1024.0
 #define COUNTSEC FREQDIV/FUNDFREQ
 #define LONGESTTIME COUNTSEC*65535
 
